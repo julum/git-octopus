@@ -1,5 +1,6 @@
 #/bin/bash
 DIR="$(dirname $0)"
+called_in_dir="$(pwd)"
 
 source "${DIR}/tools/setup_color.sh"
 
@@ -131,7 +132,7 @@ git-octopus() {
                     else
                         OUT="${OUT}${GREEN}\342\234\224 ${subdir}${RESET}\n"
                     fi
-                    cd ${dir}
+                    cd ${called_in_dir}
                     echo ""
                 fi
         fi
