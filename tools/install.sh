@@ -39,6 +39,16 @@ setup_color() {
 	fi
 }
 
+check_installation() {
+
+    if [ -d "${GIT_OCTOPUS}" ]; then
+        echo 1
+    else
+        echo 0
+    fi
+
+}
+
 setup_gitoctopus() {
     echo "${BLUE}Cloning git-octopus...${RESET}"
 
@@ -66,6 +76,12 @@ install_git_octopus() {
 
 }
 
+update_gitoctopus() {
+    echo "Git Octopus is already installed. Please update it with "
+    echo "  ${GREEN}git-octopus update${RESET}"
+}
+
+
 main() {
 
     # Parse Arguments
@@ -79,17 +95,22 @@ main() {
     done
 
     setup_color
-    setup_gitoctopus
-    install_git_octopus
+    INSTALLED=$(check_installation)
+    if [[ $INSTALLED -eq 0 ]]; then
+        setup_gitoctopus
+        install_git_octopus
 
-    printf "$GREEN"
+        printf "$GREEN"
     cat <<-'EOF'
         git-octopus successfully installed!
 
         Update all your repos instantly <3
 
 	EOF
-    printf "${RESET}"
+        printf "${RESET}"
+    else
+        update_gitoctopus
+    fi
 }
 
 main "$@"

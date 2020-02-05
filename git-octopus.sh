@@ -1,6 +1,6 @@
 #/bin/bash
 DIR="$(dirname $0)"
-called_in_dir="$(pwd)"
+GIT_OCTOPUS=${GIT_OCTOPUS:-~/.git-octopus}
 
 source "${DIR}/tools/setup_color.sh"
 
@@ -16,7 +16,17 @@ inside the current directory!"
   echo "  branches"
   echo "    Lists the current checked out branches of the subdirectories"
   echo ""
+  echo "  checkout-master"
+  echo "    Checkout the master branch and bring it on sync with origin/master (only if ff-merge is possible)"
   echo ""
+  echo ""
+}
+
+__update() {
+    echo "Check for updates..."
+    cd "${GIT_OCTOPUS}"
+    git pull
+    cd "$called_in_dir"
 }
 
 __is_git_repo() {
@@ -72,7 +82,7 @@ __checkout_master() {
 
 git-octopus() {
     setup_color
-
+    local called_in_dir="$(pwd)"
     local CMD="__update_repo"
     local TARGETDIRS="*"
     local PATTERN=""
@@ -90,26 +100,21 @@ git-octopus() {
                 checkout-master)
                     CMD="__checkout_master"
                     ;;
+                update)
+                    CMD="__update"
+                    ;;
                 *)
+                    CMD="__update_repo"
                     PATTERN=$1
                     ;;
         esac
         shift
     done
 
-    if [ "$1" = "branches" ]; then
-        CMD="__list_branches"
-        shift
-    fi
 
-    if [ "$1" = "checkout-master" ]; then
-        CMD="__checkout_master"
-        shift
-    fi
-
-    if [ $# -gt 0 ]; then
-        PATTERN=$1
-        shift
+    if [ "$CMD" = "__update" ]; then
+        __update
+        return
     fi
 
     if [ "$CMD" = "__update_repo" ]; then
@@ -132,7 +137,7 @@ git-octopus() {
                     else
                         OUT="${OUT}${GREEN}\342\234\224 ${subdir}${RESET}\n"
                     fi
-                    cd ${called_in_dir}
+                    cd "${called_in_dir}"
                     echo ""
                 fi
         fi
