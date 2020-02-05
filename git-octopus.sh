@@ -57,7 +57,10 @@ __update_repo() {
   echo "> git merge --ff-only"
   git merge --ff-only
 
+  RC=$?
+
   echo "Done."
+  return $RC
 }
 
 __list_branches() {
